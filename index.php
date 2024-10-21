@@ -17,7 +17,6 @@ $arFilter = Array("IBLOCK_ID"=>$IBLOCK_ID,"ACTIVE"=>"Y");
 $obIBlockResult = CIBlockElement::GetList($arSort, $arFilter);
 
 while($arFields = $obIBlockResult->GetNext()){
-  //var_dump($arFields);
   //CIBlockElement::Delete($arFields['ID']);
 }
 
