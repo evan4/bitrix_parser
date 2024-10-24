@@ -41,22 +41,21 @@ while (($data = fgetcsv($handle)) !== false) {
   }
 
   $row++;
-  $PROP = [];
-  $PROP['ACTIVITY'] = $data[9];
-  $PROP['FIELD'] = $data[11];
-  $PROP['OFFICE'] = $data[1];
-  $PROP['LOCATION'] = $data[2];
-  $PROP['REQUIRE'] = $data[4];
-  $PROP['DUTY'] = $data[5];
-  $PROP['CONDITIONS'] = $data[6];
-  $PROP['EMAIL'] = $data[12];
-  $PROP['DATE'] = date('d.m.Y');
-  $PROP['TYPE'] = $data[8];
-  $PROP['SALARY_TYPE'] = '';
-  $PROP['SALARY_VALUE'] = $data[7];
-  $PROP['SCHEDULE'] = $data[10];
-
-  $num = count($data);
+  $PROP = [
+    'OFFICE' => $data[1],
+    'LOCATION' => $data[2],
+    'REQUIRE' => $data[4],
+    'DUTY' => $data[5],
+    'CONDITIONS' => $data[6],
+    'SALARY_VALUE' => $data[7],
+    'TYPE' => $data[8],
+    'ACTIVITY' => $data[9],
+    'SCHEDULE' => $data[10],
+    'FIELD' => $data[11],
+    'EMAIL' => $data[12],
+    'SALARY_TYPE' => '',
+    'DATE' => date('d.m.Y'),
+  ];
 
   foreach ($PROP as $key => &$value) {
     $value = trim($value);
@@ -69,22 +68,23 @@ while (($data = fgetcsv($handle)) !== false) {
         }
     }
   }
-  
+
   if ($PROP['SALARY_VALUE'] == '-') {
     $PROP['SALARY_VALUE'] = '';
   } elseif ($PROP['SALARY_VALUE'] == 'по договоренности') {
       $PROP['SALARY_VALUE'] = '';
-      $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['договорная'];
+      //$PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['договорная'];
   } else {
       $arSalary = explode(' ', $PROP['SALARY_VALUE']);
       if ($arSalary[0] == 'от' || $arSalary[0] == 'до') {
-          $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE'][$arSalary[0]];
+          //$PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE'][$arSalary[0]];
           array_splice($arSalary, 0, 1);
           $PROP['SALARY_VALUE'] = implode(' ', $arSalary);
       } else {
-          $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['='];
+          //$PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['='];
       }
   }
+
   $arLoadProductArray = [
     "MODIFIED_BY" => $USER->GetID(),
     "IBLOCK_SECTION_ID" => false,
