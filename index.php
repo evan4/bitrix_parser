@@ -58,9 +58,18 @@ while (($data = fgetcsv($handle)) !== false) {
 
   $num = count($data);
 
-  // for ($c=0; $c < $num; $c++) {
-
-  // }
+  foreach ($PROP as $key => &$value) {
+    $value = trim($value);
+    $value = str_replace('\n', '', $value);
+    if (stripos($value, '•') !== false) {
+        $value = explode('•', $value);
+        array_splice($value, 0, 1);
+        foreach ($value as &$str) {
+            $str = trim($str);
+        }
+    }
+  }
+  
   if ($PROP['SALARY_VALUE'] == '-') {
     $PROP['SALARY_VALUE'] = '';
   } elseif ($PROP['SALARY_VALUE'] == 'по договоренности') {
