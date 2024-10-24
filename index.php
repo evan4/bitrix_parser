@@ -17,13 +17,21 @@ $arFilter = Array(
   "IBLOCK_ID" => $IBLOCK_ID,
 );
 
-$obIBlockResult = CIBlockElement::GetList(
-  [], $arFilter, false, false, ['ID', 'NAME']
+$rsProp = CIBlockPropertyEnum::GetList(
+  ["SORT" => "ASC", "VALUE" => "ASC"],
+  ['IBLOCK_ID' => $IBLOCK_ID]
 );
 
-while($arFields = $obIBlockResult->GetNext()){
-  CIBlockElement::Delete($arFields['ID']);
+while ($arProp = $rsProp->Fetch()) {
+  $key = trim($arProp['VALUE']);
+  $arProps[$arProp['PROPERTY_CODE']][$key] = $arProp['ID'];
 }
+
+$rsElements = CIBlockElement::GetList([], ['IBLOCK_ID' => $IBLOCK_ID], false, false, ['ID']);
+while ($element = $rsElements->GetNext()) {
+    CIBlockElement::Delete($element['ID']);
+}
+
 
 if (($handle = fopen("vacancy.csv", "r")) === false){
   echo "<p>Файл csv не найден или нет прав на чтение</p>";
@@ -73,15 +81,15 @@ while (($data = fgetcsv($handle)) !== false) {
     $PROP['SALARY_VALUE'] = '';
   } elseif ($PROP['SALARY_VALUE'] == 'по договоренности') {
       $PROP['SALARY_VALUE'] = '';
-      //$PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['договорная'];
+      $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['договорная'];
   } else {
       $arSalary = explode(' ', $PROP['SALARY_VALUE']);
       if ($arSalary[0] == 'от' || $arSalary[0] == 'до') {
-          //$PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE'][$arSalary[0]];
+          $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE'][$arSalary[0]];
           array_splice($arSalary, 0, 1);
           $PROP['SALARY_VALUE'] = implode(' ', $arSalary);
       } else {
-          //$PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['='];
+          $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['='];
       }
   }
 
