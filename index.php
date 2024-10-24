@@ -61,7 +61,21 @@ while (($data = fgetcsv($handle)) !== false) {
   // for ($c=0; $c < $num; $c++) {
 
   // }
-
+  if ($PROP['SALARY_VALUE'] == '-') {
+    $PROP['SALARY_VALUE'] = '';
+  } elseif ($PROP['SALARY_VALUE'] == 'по договоренности') {
+      $PROP['SALARY_VALUE'] = '';
+      $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['договорная'];
+  } else {
+      $arSalary = explode(' ', $PROP['SALARY_VALUE']);
+      if ($arSalary[0] == 'от' || $arSalary[0] == 'до') {
+          $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE'][$arSalary[0]];
+          array_splice($arSalary, 0, 1);
+          $PROP['SALARY_VALUE'] = implode(' ', $arSalary);
+      } else {
+          $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['='];
+      }
+  }
   $arLoadProductArray = [
     "MODIFIED_BY" => $USER->GetID(),
     "IBLOCK_SECTION_ID" => false,
