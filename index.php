@@ -8,30 +8,59 @@ $APPLICATION->SetTitle("Прямой вызов API Битрикса на стр
 <h1><?=$APPLICATION->ShowTitle()?></h1>
 <div class="box">
 <?
-$IBLOCK_ID = 15;
+$IBLOCK_ID = 17;
+$arProps = [];
 
 if(!CModule::IncludeModule("iblock")) die('iblock module is not included!');
 //делаем выборку из Инфоблока
-$arSort = Array("SORT"=>"ASC", "NAME"=>"ASC");
-$arFilter = Array("IBLOCK_ID"=>$IBLOCK_ID,"ACTIVE"=>"Y");
-$obIBlockResult = CIBlockElement::GetList($arSort, $arFilter);
+$arFilter = Array(
+  "IBLOCK_ID" => $IBLOCK_ID,
+);
+
+$obIBlockResult = CIBlockElement::GetList(
+  [], $arFilter, false, false, ['ID', 'NAME']
+);
 
 while($arFields = $obIBlockResult->GetNext()){
-  //CIBlockElement::Delete($arFields['ID']);
+  CIBlockElement::Delete($arFields['ID']);
 }
 
-if (($handle = fopen("export_file.csv", "r")) === false) die;
+if (($handle = fopen("vacancy.csv", "r")) === false){
+  echo "<p>Файл csv не найден или нет прав на чтение</p>";
+  echo "</div>";
+  die;
+}
+
+$row = 1;
 
 while (($data = fgetcsv($handle)) !== false) {
+  
   if ($row == 1) {
       $row++;
       continue;
   }
+
+  $row++;
   $PROP = [];
-  $PROP['IE_NAME'] = $data[1];
-  $PROP['IE_ID'] = $data[2];
-  $PROP['IE_ACTIVE'] = $data[3];
-  $PROP['IC_GROUP0'] = $data[18];
+  $PROP['ACTIVITY'] = $data[9];
+  $PROP['FIELD'] = $data[11];
+  $PROP['OFFICE'] = $data[1];
+  $PROP['LOCATION'] = $data[2];
+  $PROP['REQUIRE'] = $data[4];
+  $PROP['DUTY'] = $data[5];
+  $PROP['CONDITIONS'] = $data[6];
+  $PROP['EMAIL'] = $data[12];
+  $PROP['DATE'] = date('d.m.Y');
+  $PROP['TYPE'] = $data[8];
+  $PROP['SALARY_TYPE'] = '';
+  $PROP['SALARY_VALUE'] = $data[7];
+  $PROP['SCHEDULE'] = $data[10];
+
+  $num = count($data);
+
+  // for ($c=0; $c < $num; $c++) {
+
+  // }
 
   $arLoadProductArray = [
     "MODIFIED_BY" => $USER->GetID(),
