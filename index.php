@@ -13,9 +13,6 @@ $arProps = [];
 
 if(!CModule::IncludeModule("iblock")) die('iblock module is not included!');
 //делаем выборку из Инфоблока
-$arFilter = Array(
-  "IBLOCK_ID" => $IBLOCK_ID,
-);
 
 $rsProp = CIBlockPropertyEnum::GetList(
   ["SORT" => "ASC", "VALUE" => "ASC"],
@@ -32,7 +29,6 @@ while ($element = $rsElements->GetNext()) {
     CIBlockElement::Delete($element['ID']);
 }
 
-
 if (($handle = fopen("vacancy.csv", "r")) === false){
   echo "<p>Файл csv не найден или нет прав на чтение</p>";
   echo "</div>";
@@ -48,7 +44,6 @@ while (($data = fgetcsv($handle)) !== false) {
       continue;
   }
 
-  $row++;
   $PROP = [
     'OFFICE' => $data[1],
     'LOCATION' => $data[2],
@@ -84,10 +79,11 @@ while (($data = fgetcsv($handle)) !== false) {
       $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['договорная'];
   } else {
       $arSalary = explode(' ', $PROP['SALARY_VALUE']);
-      if ($arSalary[0] == 'от' || $arSalary[0] == 'до') {
+      if (
+        mb_stripos($PROP['SALARY_VALUE'], 'от')
+        || mb_stripos($PROP['SALARY_VALUE'], 'до') 
+        ) {
           $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE'][$arSalary[0]];
-          array_splice($arSalary, 0, 1);
-          $PROP['SALARY_VALUE'] = implode(' ', $arSalary);
       } else {
           $PROP['SALARY_TYPE'] = $arProps['SALARY_TYPE']['='];
       }
@@ -102,6 +98,7 @@ while (($data = fgetcsv($handle)) !== false) {
     "ACTIVE" => end($data) ? 'Y' : 'N',
   ];
   $el = new CIBlockElement;
+
   if ($PRODUCT_ID = $el->Add($arLoadProductArray)) {
     echo "Добавлен элемент с ID : " . $PRODUCT_ID . "<br>";
   } else {
